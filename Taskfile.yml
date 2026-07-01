@@ -1,0 +1,132 @@
+version: "3"
+
+dotenv:
+  - .env
+
+vars:
+  APP_NAME: TrueFlow
+  BIN_DIR: bin
+  OUT: "{{.BIN_DIR}}/{{.APP_NAME}}"
+  SWAGGER_DOCS_DIR: docs/swagger
+  MAIN_PATH: cmd/server/main.go
+  DB_URL: 'postgres://{{.POSTGRES_USER}}:{{.POSTGRES_PASSWORD}}@{{.POSTGRES_HOST}}:{{.POSTGRES_PORT}}/{{.POSTGRES_DB}}?sslmode={{.POSTGRES_SSLMODE}}'
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list
+
+  # ---------------------------------------------------------------------------
+  # Development
+  # ---------------------------------------------------------------------------
+
+  run:
+    desc: Run the application
+    cmds:
+      - go run ./cmd/{{.APP_NAME}}
+
+  watch:
+    desc: Run with live reload
+    cmds:
+      - air -c .air.toml
+
+  # ---------------------------------------------------------------------------
+  # Build
+  # ---------------------------------------------------------------------------
+
+  build:
+    desc: Build the application
+    cmds:
+      - go build -o {{.OUT}} {{.MAIN_PATH}}
+
+  clean:
+    desc: Remove build artifacts
+    cmds:
+      - rm -rf {{.BIN_DIR}}
+
+  # ---------------------------------------------------------------------------
+  # Quality
+  # ---------------------------------------------------------------------------
+
+  fmt:
+    desc: Format source code
+    cmds:
+      - gofmt -s -w .
+
+  lint:
+    desc: Run linters
+    cmds:
+      - golangci-lint run ./...
+
+  lint-fix:
+    desc: Automatically fix lint issues
+    cmds:
+      - golangci-lint run --fix ./...
+
+  check:
+    desc: Run formatting, linting and tests
+    deps:
+      - fmt
+      - test
+      - lint
+
+  # ---------------------------------------------------------------------------
+  # Tests
+  # ---------------------------------------------------------------------------
+
+  test:
+    desc: Run tests
+    cmds:
+      - go test -race -timeout=60s ./...
+
+  # ---------------------------------------------------------------------------
+  # Database
+  # ---------------------------------------------------------------------------
+
+  migrate-up:
+    desc: Apply all database migrations
+    cmds:
+      - goose -dir ./migrations postgres "{{.DB_URL}}" up
+
+  migrate-down:
+    desc: Roll back the last migration
+    cmds:
+      - goose -dir ./migrations postgres "{{.DB_URL}}" down
+
+  migrate-new:
+    desc: Create a new migration (task migrate-new NAME=create_users)
+    requires:
+      vars:
+        - NAME
+    cmds:
+      - goose -dir ./migrations create {{.NAME}} sql
+
+  migrate-status:
+    desc: Show migration status
+    cmds:
+      - goose -dir ./migrations postgres "{{.DB_URL}}" status
+
+  # ---------------------------------------------------------------------------
+  # Documentation
+  # ---------------------------------------------------------------------------
+
+  swag:
+    desc: Generate Swagger documentation
+    cmds:
+      - |
+        swag init \
+          -g {{.MAIN_PATH}} \
+          -o {{.SWAGGER_DOCS_DIR}} \
+          --parseDependency \
+          --parseInternal
+
+  # ---------------------------------------------------------------------------
+  # Dependencies
+  # ---------------------------------------------------------------------------
+
+  deps:
+    desc: Tidy and verify Go modules
+    cmds:
+      - go mod tidy
+      - go mod verify
