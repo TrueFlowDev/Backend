@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"context"
+
 	"github.com/TrueFlowDev/Backend/internal/module/user/domain/entity"
 	"github.com/TrueFlowDev/Backend/internal/module/user/domain/port"
 	shared "github.com/TrueFlowDev/Backend/internal/shared/domain/value_object"
@@ -22,13 +24,13 @@ func NewFindUserByPhoneUsecase(
 	}
 }
 
-func (u *FindUserByPhoneUsecase) Execute(input FindUserByPhoneInput) (*entity.User, error) {
+func (u *FindUserByPhoneUsecase) Execute(ctx context.Context, input FindUserByPhoneInput) (*entity.User, error) {
 	userPhone, err := shared.NewPhone(input.Phone)
 	if err != nil {
 		return nil, err
 	}
 
-	user, err := u.userRepository.FindByPhone(userPhone)
+	user, err := u.userRepository.FindByPhone(ctx, userPhone)
 	if err != nil {
 		return nil, err
 	}

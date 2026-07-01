@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"context"
+
 	"github.com/TrueFlowDev/Backend/internal/module/user/domain/entity"
 	"github.com/TrueFlowDev/Backend/internal/module/user/domain/port"
 	user "github.com/TrueFlowDev/Backend/internal/module/user/domain/value_object"
@@ -31,7 +33,7 @@ func NewRegisterUserUsecase(
 	}
 }
 
-func (u *RegisterUserUsecase) Execute(input RegisterUserInput) (RegisterUserOutput, error) {
+func (u *RegisterUserUsecase) Execute(ctx context.Context, input RegisterUserInput) (RegisterUserOutput, error) {
 	newUserPhone, err := shared.NewPhone(input.Phone)
 	if err != nil {
 		return RegisterUserOutput{}, err
@@ -49,7 +51,7 @@ func (u *RegisterUserUsecase) Execute(input RegisterUserInput) (RegisterUserOutp
 		return RegisterUserOutput{}, err
 	}
 
-	if err := u.userRepository.Create(newUser); err != nil {
+	if err := u.userRepository.Create(ctx, newUser); err != nil {
 		return RegisterUserOutput{}, err
 	}
 
