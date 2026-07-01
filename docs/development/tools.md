@@ -59,7 +59,7 @@ Runs multiple Go linters with a unified configuration to ensure code quality and
 **Installation**
 
 ```bash
-go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 ```
 
 **Verify**

@@ -1,0 +1,42 @@
+version: "2"
+
+linters:
+  default: standard
+
+  enable:
+    - bodyclose
+    - copyloopvar
+    - durationcheck
+    - errcheck
+    - errorlint
+    - exhaustive
+    - gocritic
+    - gosec
+    - importas
+    - misspell
+    - nilerr
+    - prealloc
+    - revive
+    - sqlclosecheck
+    - unconvert
+    - usestdlibvars
+
+  settings:
+    revive:
+      confidence: 0.8
+      rules:
+        - name: package-comments
+          disabled: true
+
+        - name: exported
+          disabled: true
+
+        - name: var-naming
+          disabled: true
+
+    gosec:
+      excludes:
+        - G115
+
+    exhaustive:
+      default-signifies-exhaustive: true

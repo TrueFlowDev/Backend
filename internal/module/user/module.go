@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/TrueFlowDev/Backend/internal/module/user/applicaiton/usecase"
+	"github.com/TrueFlowDev/Backend/internal/module/user/application/usecase"
 	"go.uber.org/fx"
 )
 
