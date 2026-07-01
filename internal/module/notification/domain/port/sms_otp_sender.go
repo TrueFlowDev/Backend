@@ -5,6 +5,6 @@ import (
 	"github.com/TrueFlowDev/Backend/internal/module/user/domain/value_object"
 )
 
-type OtpSender interface {
+type SmsOtpSender interface {
 	Send(phone value_object.Phone, otp domain.OTP) error
 }
