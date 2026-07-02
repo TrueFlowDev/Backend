@@ -1,15 +1,7 @@
 package value_object
 
 import (
-	"errors"
-	"strings"
-
-	"github.com/nyaruka/phonenumbers"
-)
-
-var (
-	ErrPhoneRequired      = errors.New("phone is required")
-	ErrPhoneInvalidFormat = errors.New("phone format is invalid")
+	"github.com/TrueFlowDev/Backend/internal/pkg/phonenumber"
 )
 
 type Phone struct {
@@ -17,27 +9,13 @@ type Phone struct {
 }
 
 func NewPhone(phone string) (Phone, error) {
-	phone = strings.TrimSpace(phone)
-
-	if phone == "" {
-		return Phone{}, ErrPhoneRequired
-	}
-
-	number, err := phonenumbers.Parse(phone, "IR")
+	normalized, err := phonenumber.NormalizePhone(phone)
 	if err != nil {
-		return Phone{}, ErrPhoneInvalidFormat
-	}
-
-	if !phonenumbers.IsValidNumber(number) {
-		return Phone{}, ErrPhoneInvalidFormat
-	}
-
-	if phonenumbers.GetNumberType(number) != phonenumbers.MOBILE {
-		return Phone{}, ErrPhoneInvalidFormat
+		return Phone{}, err
 	}
 
 	return Phone{
-		value: phonenumbers.Format(number, phonenumbers.E164),
+		value: normalized,
 	}, nil
 }
 
