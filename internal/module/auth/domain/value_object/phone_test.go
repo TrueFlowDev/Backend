@@ -4,7 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/TrueFlowDev/Backend/internal/shared/domain/value_object"
+	"github.com/TrueFlowDev/Backend/internal/module/auth/domain/value_object"
+	"github.com/TrueFlowDev/Backend/internal/pkg/phonenumber"
 )
 
 func TestNewPhone(t *testing.T) {
@@ -19,10 +20,10 @@ func TestNewPhone(t *testing.T) {
 		{"valid mobile", "09121234567", "+989121234567", nil},
 		{"valid mobile with country code", "+989121234567", "+989121234567", nil},
 		{"valid mobile with spaces", " 09121234567 ", "+989121234567", nil},
-		{"empty phone", "", "", value_object.ErrPhoneRequired},
-		{"invalid format", "abcdef", "", value_object.ErrPhoneInvalidFormat},
-		{"short phone", "0912", "", value_object.ErrPhoneInvalidFormat},
-		{"fixed line", "02112345678", "", value_object.ErrPhoneInvalidFormat},
+		{"empty phone", "", "", phonenumber.ErrRequired},
+		{"invalid format", "abcdef", "", phonenumber.ErrInvalidFormat},
+		{"short phone", "0912", "", phonenumber.ErrInvalidFormat},
+		{"fixed line", "02112345678", "", phonenumber.ErrInvalidFormat},
 	}
 
 	for _, tt := range tests {

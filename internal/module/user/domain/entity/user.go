@@ -3,14 +3,13 @@ package entity
 import (
 	"time"
 
-	user "github.com/TrueFlowDev/Backend/internal/module/user/domain/value_object"
-	shared "github.com/TrueFlowDev/Backend/internal/shared/domain/value_object"
+	"github.com/TrueFlowDev/Backend/internal/module/user/domain/value_object"
 )
 
 type User struct {
-	id       user.UserID
-	phone    shared.Phone
-	password user.HashedPassword
+	id       value_object.UserID
+	phone    value_object.Phone
+	password value_object.HashedPassword
 
 	createdAt time.Time
 	updatedAt time.Time
@@ -18,9 +17,9 @@ type User struct {
 }
 
 func NewUser(
-	id user.UserID,
-	phone shared.Phone,
-	password user.HashedPassword,
+	id value_object.UserID,
+	phone value_object.Phone,
+	password value_object.HashedPassword,
 ) (*User, error) {
 	now := time.Now().UTC()
 	return &User{
@@ -35,16 +34,16 @@ func NewUser(
 
 // <-- Getters -->
 
-func (u *User) ID() user.UserID               { return u.id }
-func (u *User) Phone() shared.Phone           { return u.phone }
-func (u *User) Password() user.HashedPassword { return u.password }
-func (u *User) CreatedAt() time.Time          { return u.createdAt }
-func (u *User) UpdatedAt() time.Time          { return u.updatedAt }
-func (u *User) DeletedAt() *time.Time         { return u.deletedAt }
+func (u *User) ID() value_object.UserID               { return u.id }
+func (u *User) Phone() value_object.Phone             { return u.phone }
+func (u *User) Password() value_object.HashedPassword { return u.password }
+func (u *User) CreatedAt() time.Time                  { return u.createdAt }
+func (u *User) UpdatedAt() time.Time                  { return u.updatedAt }
+func (u *User) DeletedAt() *time.Time                 { return u.deletedAt }
 
 // <-- Setters -->
 
-func (u *User) ChangePassword(newPassword user.HashedPassword) {
+func (u *User) ChangePassword(newPassword value_object.HashedPassword) {
 	u.password = newPassword
 	u.updatedAt = time.Now().UTC()
 }

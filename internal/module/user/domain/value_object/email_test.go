@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/TrueFlowDev/Backend/internal/shared/domain/value_object"
+	"github.com/TrueFlowDev/Backend/internal/module/user/domain/value_object"
 )
 
 func TestNewEmail(t *testing.T) {

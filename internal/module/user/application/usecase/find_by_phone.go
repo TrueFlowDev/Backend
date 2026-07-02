@@ -5,7 +5,7 @@ import (
 
 	"github.com/TrueFlowDev/Backend/internal/module/user/domain/entity"
 	"github.com/TrueFlowDev/Backend/internal/module/user/domain/port"
-	shared "github.com/TrueFlowDev/Backend/internal/shared/domain/value_object"
+	"github.com/TrueFlowDev/Backend/internal/module/user/domain/value_object"
 )
 
 type FindUserByPhoneInput struct {
@@ -25,7 +25,7 @@ func NewFindUserByPhoneUsecase(
 }
 
 func (u *FindUserByPhoneUsecase) Execute(ctx context.Context, input FindUserByPhoneInput) (*entity.User, error) {
-	userPhone, err := shared.NewPhone(input.Phone)
+	userPhone, err := value_object.NewPhone(input.Phone)
 	if err != nil {
 		return nil, err
 	}
