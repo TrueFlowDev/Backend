@@ -4,11 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/TrueFlowDev/Backend/internal/module/auth/domain"
 	"github.com/TrueFlowDev/Backend/internal/module/auth/domain/port"
-	"github.com/TrueFlowDev/Backend/internal/module/user/application/usecase"
-	user "github.com/TrueFlowDev/Backend/internal/module/user/domain/port"
-	"github.com/TrueFlowDev/Backend/internal/module/user/domain/value_object"
+	"github.com/TrueFlowDev/Backend/internal/module/auth/domain/value_object"
 )
 
 type VerifyOTPAndRegisterInput struct {
@@ -23,35 +20,32 @@ type VerifyOTPAndRegisterOutput struct {
 
 type VerifyOTPAndRegisterUsecase struct {
 	otpStore            port.OTPStore
-	registerUserUsecase usecase.RegisterUserUsecase
+	userRegisterer      port.UserRegisterer
 	accessTokenProvider port.AccessTokenProvider
 	passwordHasher      port.PasswordHasher
-	userIdGenerator     user.UserIdGenerator
 }
 
 func NewVerifyOTPAndRegisterUsecase(
 	otpStore port.OTPStore,
-	registerUserUsecase usecase.RegisterUserUsecase,
+	userRegisterer port.UserRegisterer,
 	accessTokenProvider port.AccessTokenProvider,
 	passwordHasher port.PasswordHasher,
-	userIdGenerator user.UserIdGenerator,
 ) *VerifyOTPAndRegisterUsecase {
 	return &VerifyOTPAndRegisterUsecase{
 		otpStore:            otpStore,
-		registerUserUsecase: registerUserUsecase,
+		userRegisterer:      userRegisterer,
 		accessTokenProvider: accessTokenProvider,
 		passwordHasher:      passwordHasher,
-		userIdGenerator:     userIdGenerator,
 	}
 }
 
 func (u *VerifyOTPAndRegisterUsecase) Execute(ctx context.Context, input VerifyOTPAndRegisterInput) (VerifyOTPAndRegisterOutput, error) {
-	userPhone, err := value_object.NewPhone(input.Phone)
+	phone, err := value_object.NewPhone(input.Phone)
 	if err != nil {
 		return VerifyOTPAndRegisterOutput{}, err
 	}
 
-	otp, err := u.otpStore.Get(ctx, userPhone)
+	otp, err := u.otpStore.Get(ctx, phone)
 	if err != nil {
 		return VerifyOTPAndRegisterOutput{}, err
 	}
@@ -65,7 +59,7 @@ func (u *VerifyOTPAndRegisterUsecase) Execute(ctx context.Context, input VerifyO
 		return VerifyOTPAndRegisterOutput{}, err
 	}
 
-	output, err := u.registerUserUsecase.Execute(ctx, usecase.RegisterUserInput{
+	output, err := u.userRegisterer.Register(ctx, port.UserRegistererInput{
 		Phone:        input.Phone,
 		HashPassword: newUserHashedPassword,
 	})
@@ -73,8 +67,8 @@ func (u *VerifyOTPAndRegisterUsecase) Execute(ctx context.Context, input VerifyO
 		return VerifyOTPAndRegisterOutput{}, err
 	}
 
-	tokenClaims := domain.AccessTokenClaims{
-		UserID:   value_object.NewUserID(output.ID),
+	tokenClaims := value_object.AccessTokenClaims{
+		UserID:   output.ID,
 		IssuedAt: time.Now().UTC(),
 		// TODO: must come from configs
 		ExpiresAt: time.Now().UTC().Add(time.Hour),

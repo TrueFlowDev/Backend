@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/TrueFlowDev/Backend/internal/module/auth/domain"
+	"github.com/TrueFlowDev/Backend/internal/module/auth/domain/entity"
 	"github.com/TrueFlowDev/Backend/internal/module/auth/domain/port"
-	"github.com/TrueFlowDev/Backend/internal/module/user/domain/value_object"
+	"github.com/TrueFlowDev/Backend/internal/module/auth/domain/value_object"
 )
 
 type SendOtpInput struct {
@@ -32,7 +32,7 @@ func NewSendOtpUsecase(
 }
 
 func (u *SendOtpUsecase) Execute(ctx context.Context, input SendOtpInput) error {
-	userPhone, err := value_object.NewPhone(input.Phone)
+	phone, err := value_object.NewPhone(input.Phone)
 	if err != nil {
 		return err
 	}
@@ -42,16 +42,16 @@ func (u *SendOtpUsecase) Execute(ctx context.Context, input SendOtpInput) error 
 	// TODO: this value must come from app configs
 	duration := 5 * time.Minute
 	otpExpiresAt := time.Now().UTC().Add(duration)
-	otp, err := domain.NewOTP(otpCode, otpExpiresAt)
+	otp, err := entity.NewOTP(otpCode, otpExpiresAt)
 	if err != nil {
 		return err
 	}
 
-	if err := u.otpStore.Set(ctx, userPhone, otp, duration); err != nil {
+	if err := u.otpStore.Set(ctx, phone, otp, duration); err != nil {
 		return err
 	}
 
-	if err := u.otpSender.Send(ctx, userPhone, otp); err != nil {
+	if err := u.otpSender.Send(ctx, phone, otp); err != nil {
 		return err
 	}
 
