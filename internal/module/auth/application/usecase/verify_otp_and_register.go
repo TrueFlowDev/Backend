@@ -60,19 +60,18 @@ func (u *VerifyOTPAndRegisterUsecase) Execute(ctx context.Context, input VerifyO
 	}
 
 	output, err := u.userRegisterer.Register(ctx, port.UserRegistererInput{
-		Phone:        input.Phone,
-		HashPassword: newUserHashedPassword,
+		Phone:          input.Phone,
+		HashedPassword: newUserHashedPassword,
 	})
 	if err != nil {
 		return VerifyOTPAndRegisterOutput{}, err
 	}
 
-	tokenClaims := value_object.AccessTokenClaims{
-		UserID:   output.ID,
-		IssuedAt: time.Now().UTC(),
-		// TODO: must come from configs
-		ExpiresAt: time.Now().UTC().Add(time.Hour),
-	}
+	// TODO: this value must come from app configs
+	duration := time.Hour
+	now := time.Now().UTC()
+	expiresAt := now.Add(duration)
+	tokenClaims := value_object.NewAccessTokenClaims(output.ID, now, expiresAt)
 
 	accessToken, err := u.accessTokenProvider.Generate(tokenClaims)
 	if err != nil {

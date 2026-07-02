@@ -3,8 +3,8 @@ package port
 import "context"
 
 type UserRegistererInput struct {
-	Phone        string
-	HashPassword string
+	Phone          string
+	HashedPassword string
 }
 
 type UserRegistererOutput struct {
